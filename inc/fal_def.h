@@ -27,26 +27,26 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define FAL_SW_VERSION                 "0.1.0"
+#define FAL_SW_VERSION "0.1.0"
 
 #ifndef FAL_MALLOC
-#define FAL_MALLOC                     malloc
+#define FAL_MALLOC malloc
 #endif
 
 #ifndef FAL_CALLOC
-#define FAL_CALLOC                     calloc
+#define FAL_CALLOC calloc
 #endif
 
 #ifndef FAL_REALLOC
-#define FAL_REALLOC                    realloc
+#define FAL_REALLOC realloc
 #endif
 
 #ifndef FAL_FREE
-#define FAL_FREE                       free
+#define FAL_FREE free
 #endif
 
 #ifndef FAL_DEBUG
-#define FAL_DEBUG                      0
+#define FAL_DEBUG 0
 #endif
 
 #if FAL_DEBUG
@@ -54,44 +54,53 @@
 #undef assert
 #endif
 #define assert(EXPR)                                                           \
-if (!(EXPR))                                                                   \
-{                                                                              \
-    printf("(%s) has assert failed at %s.\n", #EXPR, __FUNCTION__);            \
-    while (1);                                                                 \
-}
-
+    if (!(EXPR))                                                               \
+    {                                                                          \
+        rt_kprintf("(%s) has assert failed at %s.\n", #EXPR, __FUNCTION__);    \
+        while (1)                                                              \
+            ;                                                                  \
+    }
 
 /* debug level log */
-#ifdef  log_d
-#undef  log_d
+#ifdef log_d
+#undef log_d
 #endif
-#define log_d(...)                     printf("[D/FAL] (%s:%d) ", __FUNCTION__, __LINE__);           printf(__VA_ARGS__);printf("\n")
+#define log_d(...)                                                             \
+    rt_kprintf("[D/FAL] (%s:%d) ", __FUNCTION__, __LINE__);                    \
+    rt_kprintf(__VA_ARGS__);                                                   \
+    rt_kprintf("\n")
 
 #else
 
 #ifdef assert
 #undef assert
 #endif
-#define assert(EXPR)                   ((void)0);
+#define assert(EXPR) ((void)0);
 
 /* debug level log */
-#ifdef  log_d
-#undef  log_d
+#ifdef log_d
+#undef log_d
 #endif
 #define log_d(...)
 #endif /* FAL_DEBUG */
 
 /* error level log */
-#ifdef  log_e
-#undef  log_e
+#ifdef log_e
+#undef log_e
 #endif
-#define log_e(...)                     printf("\033[31;22m[E/FAL] (%s:%d) ", __FUNCTION__, __LINE__);printf(__VA_ARGS__);printf("\033[0m\n")
+#define log_e(...)                                                             \
+    rt_kprintf("\033[31;22m[E/FAL] (%s:%d) ", __FUNCTION__, __LINE__);         \
+    rt_kprintf(__VA_ARGS__);                                                   \
+    rt_kprintf("\033[0m\n")
 
 /* info level log */
-#ifdef  log_i
-#undef  log_i
+#ifdef log_i
+#undef log_i
 #endif
-#define log_i(...)                     printf("\033[36;22m[I/FAL] ");                                printf(__VA_ARGS__);printf("\033[0m\n")
+#define log_i(...)                                                             \
+    rt_kprintf("\033[36;22m[I/FAL] ");                                         \
+    rt_kprintf(__VA_ARGS__);                                                   \
+    rt_kprintf("\033[0m\n")
 
 /* FAL flash and partition device name max length */
 #ifndef FAL_DEV_NAME_MAX
@@ -104,7 +113,7 @@ struct fal_flash_dev
 
     /* flash device start address and len  */
     uint32_t addr;
-    size_t len;
+    size_t   len;
     /* the block size in the flash for erase minimum granularity */
     size_t blk_size;
 
@@ -131,7 +140,7 @@ struct fal_partition
     char flash_name[FAL_DEV_NAME_MAX];
 
     /* partition offset address on flash device */
-    long offset;
+    long   offset;
     size_t len;
 
     uint8_t reserved;
