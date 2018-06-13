@@ -97,10 +97,10 @@
 #ifdef log_i
 #undef log_i
 #endif
-#define log_i(...)                                                             \
-    rt_kprintf("\033[36;22m[I/FAL] ");                                         \
-    rt_kprintf(__VA_ARGS__);                                                   \
-    rt_kprintf("\033[0m\n")
+#define log_i(...)
+// rt_kprintf("\033[36;22m[I/FAL] ");                                         \
+    // rt_kprintf(__VA_ARGS__);                                                   \
+    // rt_kprintf("\033[0m\n")
 
 /* FAL flash and partition device name max length */
 #ifndef FAL_DEV_NAME_MAX
