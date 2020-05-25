@@ -56,7 +56,7 @@ FAL 相关的 API 如图所示，[点击此处查看 API 参数详解](docs/fal_
 
 ### 1.4、许可证
 
-fal package 遵循 LGPLv2.1 许可，详见 `LICENSE` 文件。
+fal package 遵循 Apache-2.0 许可，详见 `LICENSE` 文件。
 
 ### 1.5、依赖
 
@@ -78,8 +78,8 @@ fal package 遵循 LGPLv2.1 许可，详见 `LICENSE` 文件。
 
 在定义 Flash 设备表前，需要先定义 Flash 设备。可以是片内 flash,  也可以是片外基于 SFUD 的 spi flash：
 
-- 定义片内 flash 设备可以参考 [`fal_flash_sfud_port.c`](https://github.com/RT-Thread-packages/fal/blob/master/samples/porting/fal_flash_sfud_port.c) 。
-- 定义片外 spi flash 设备可以参考 [`fal_flash_stm32f2_port.c`](https://github.com/RT-Thread-packages/fal/blob/master/samples/porting/fal_flash_stm32f2_port.c) 。
+- 定义片内 flash 设备可以参考 [`fal_flash_stm32f2_port.c`](https://github.com/RT-Thread-packages/fal/blob/master/samples/porting/fal_flash_stm32f2_port.c) 。
+- 定义片外 spi flash 设备可以参考 [`fal_flash_sfud_port.c`](https://github.com/RT-Thread-packages/fal/blob/master/samples/porting/fal_flash_sfud_port.c) 。
 
 定义具体的 Flash 设备对象，用户需要根据自己的 Flash 情况分别实现 `init`、 `read`、 `write`、 `erase` 这些操作函数：
 
@@ -113,7 +113,15 @@ fal package 遵循 LGPLv2.1 许可，详见 `LICENSE` 文件。
 用户需要根据自己的 Flash 情况分别实现这些操作函数。在文件最底部定义了具体的 Flash 设备对象 ，如下示例定义了 stm32f2 片上 flash：stm32f2_onchip_flash
 
 ```c
-const struct fal_flash_dev stm32f2_onchip_flash = { "stm32_onchip", 0x08000000, 1024*1024, 128*1024, {init, read, write, erase} };
+const struct fal_flash_dev stm32f2_onchip_flash =
+{
+    .name       = "stm32_onchip",
+    .addr       = 0x08000000,
+    .len        = 1024*1024,
+    .blk_size   = 128*1024,
+    .ops        = {init, read, write, erase},
+    .write_gran = 8
+};
 ```
 
 - `"stm32_onchip"` : Flash 设备的名字。
@@ -121,6 +129,11 @@ const struct fal_flash_dev stm32f2_onchip_flash = { "stm32_onchip", 0x08000000, 
 - `1024*1024`：Flash 的总大小（1MB）。
 - `128*1024`：Flash 块/扇区大小（因为 STM32F2 各块大小不均匀，所以擦除粒度为最大块的大小：128K）。
 - `{init, read, write, erase}` ：Flash 的操作函数。 如果没有 init 初始化过程，第一个操作函数位置可以置空。
+- `8` : 设置写粒度，单位 bit， 0 表示未生效（默认值为 0 ），该成员是 fal 版本大于 0.4.0 的新增成员。各个 flash 写入粒度不尽相同，可通过该成员进行设置，以下列举几种常见 Flash 写粒度：
+  - nor flash: 1 bit
+  - stm32f2/f4:  8 bit
+  - stm32f1:  32 bit
+  - stm32l4:  64 bit
 
 ### 2.2、定义 flash 设备表
 
